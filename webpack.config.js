@@ -1,5 +1,7 @@
 module.exports = {
-  entry: './src/index.jsx',
+  entry: [
+    './src/app.jsx',
+  ],
   resolve: {
     extensions: ['', '.js', '.jsx']
   },
@@ -10,6 +12,6 @@ module.exports = {
     }]
   },
   output: {
-    filename: 'js/global.js'
+    filename: 'public/js/global.js'
   }
 };

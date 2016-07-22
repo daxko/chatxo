@@ -1,15 +1,16 @@
 import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import { Router, Route, hashHistory } from 'react-router';
+import configureStore from './store/configure';
+import ChatApp from './components/ChatApp';
 
-class App extends React.Component {
+const store = configureStore({});
 
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (<div>Hello World</div>);
-  }
-
-};
-
-export default App;
+render((
+  <Provider store={store}>
+    <Router history={hashHistory}>
+      <Route path="/" component={ChatApp} />
+    </Router>
+  </Provider>
+), document.getElementById('react'));
