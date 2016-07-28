@@ -67,20 +67,20 @@
 
 	var _configure2 = _interopRequireDefault(_configure);
 
-	var _ChatApp = __webpack_require__(262);
+	var _ChatApp = __webpack_require__(264);
 
 	var _ChatApp2 = _interopRequireDefault(_ChatApp);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var store = (0, _configure2.default)({});
+	var store = (0, _configure2.default)({ messages: [{ text: 'Hello' }, { text: 'World' }] });
 
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRedux.Provider,
 	  { store: store },
 	  _react2.default.createElement(
 	    _reactRouter.Router,
-	    { history: _reactRouter.hashHistory },
+	    { history: _reactRouter.hashHistory, state: store.getState() },
 	    _react2.default.createElement(_reactRouter.Route, { path: '/', component: _ChatApp2.default })
 	  )
 	), document.getElementById('react'));
@@ -28775,12 +28775,67 @@
 
 	var _redux = __webpack_require__(180);
 
+	var _reducers = __webpack_require__(262);
+
+	var _reducers2 = _interopRequireDefault(_reducers);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function configureStore(initialState) {
-	  return (0, _redux.createStore)(initialState);
+	  return (0, _redux.createStore)(_reducers2.default, initialState);
 	}
 
 /***/ },
 /* 262 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _actions = __webpack_require__(263);
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function reducer() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+	  var action = arguments[1];
+
+	  switch (action) {
+	    case _actions.ADD_MESSAGE:
+	      {
+	        return Object.assign({}, state, {
+	          messages: [].concat(_toConsumableArray(state.messages), [{
+	            text: action.text
+	          }])
+	        });
+	      }
+	    default:
+	      return state;
+	  }
+	}
+
+	exports.default = reducer;
+
+/***/ },
+/* 263 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var ADD_MESSAGE = 'ADD_MESSAGE';
+
+	function addMessage(text) {
+	  return {
+	    type: ADD_MESSAGE,
+	    text: text
+	  };
+	}
+
+/***/ },
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28794,6 +28849,8 @@
 	var _react = __webpack_require__(2);
 
 	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(173);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28813,12 +28870,33 @@
 	  }
 
 	  _createClass(App, [{
+	    key: 'handleKeyup',
+	    value: function handleKeyup(e) {
+	      if (e.which === '13') {
+	        this.refs.input.value = '';
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var messages = this.props.messages;
+
+
 	      return _react2.default.createElement(
 	        'div',
 	        null,
-	        'Hello World'
+	        _react2.default.createElement(
+	          'ul',
+	          null,
+	          messages.map(function (message) {
+	            return _react2.default.createElement(
+	              'li',
+	              null,
+	              message.text
+	            );
+	          })
+	        ),
+	        _react2.default.createElement('input', { ref: 'input', type: 'text', onKeyUp: this.handleKeyup })
 	      );
 	    }
 	  }]);
@@ -28826,7 +28904,9 @@
 	  return App;
 	}(_react2.default.Component);
 
-	exports.default = App;
+	exports.default = (0, _reactRedux.connect)(function (state) {
+	  return { messages: state.messages };
+	})(App);
 
 /***/ }
 /******/ ]);

@@ -3,7 +3,7 @@
     "ecmaFeatures": {
       "jsx": true,
       "impliedStrict": true,
-      "experimentalObjectRestSpread" true
+      "experimentalObjectRestSpread": true
     },
     "sourceType": "module"
   },
