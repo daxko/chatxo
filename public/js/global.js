@@ -28800,10 +28800,10 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function reducer() {
-	  var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 	  var action = arguments[1];
 
-	  switch (action) {
+	  switch (action.type) {
 	    case _actions.ADD_MESSAGE:
 	      {
 	        return Object.assign({}, state, {
@@ -28825,7 +28825,10 @@
 
 	'use strict';
 
-	var ADD_MESSAGE = 'ADD_MESSAGE';
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var ADD_MESSAGE = exports.ADD_MESSAGE = 'ADD_MESSAGE';
 
 	function addMessage(text) {
 	  return {
@@ -28833,6 +28836,8 @@
 	    text: text
 	  };
 	}
+
+	exports.default = addMessage;
 
 /***/ },
 /* 264 */
@@ -28852,6 +28857,10 @@
 
 	var _reactRedux = __webpack_require__(173);
 
+	var _actions = __webpack_require__(263);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28866,14 +28875,22 @@
 	  function App(props) {
 	    _classCallCheck(this, App);
 
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+
+	    _this.handleKeyUp = _this.handleKeyUp.bind(_this);
+	    return _this;
 	  }
 
 	  _createClass(App, [{
-	    key: 'handleKeyup',
-	    value: function handleKeyup(e) {
-	      if (e.which === '13') {
-	        this.refs.input.value = '';
+	    key: 'handleKeyUp',
+	    value: function handleKeyUp(e) {
+	      var sendMessage = this.props.sendMessage;
+	      var input = this.refs.input;
+
+
+	      if (e.which === 13) {
+	        sendMessage(input.value);
+	        input.value = '';
 	      }
 	    }
 	  }, {
@@ -28896,7 +28913,7 @@
 	            );
 	          })
 	        ),
-	        _react2.default.createElement('input', { ref: 'input', type: 'text', onKeyUp: this.handleKeyup })
+	        _react2.default.createElement('input', { ref: 'input', type: 'text', onKeyUp: this.handleKeyUp })
 	      );
 	    }
 	  }]);
@@ -28906,6 +28923,10 @@
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
 	  return { messages: state.messages };
+	}, function (dispatch) {
+	  return { sendMessage: function sendMessage(message) {
+	      return dispatch((0, _actions2.default)(message));
+	    } };
 	})(App);
 
 /***/ }

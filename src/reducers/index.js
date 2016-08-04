@@ -1,7 +1,7 @@
-import { ADD_MESSAGE } from '../actions'
+import { ADD_MESSAGE } from '../actions';
 
-function reducer(state = [], action) {
-  switch(action) {
+function reducer(state = {}, action) {
+  switch(action.type) {
     case ADD_MESSAGE: {
       return Object.assign({}, state, {
         messages: [
@@ -10,11 +10,11 @@ function reducer(state = [], action) {
             text: action.text
           }
         ]
-      })
+      });
     }
     default:
-      return state
+      return state;
   }
 }
 
-export default reducer
+export default reducer;

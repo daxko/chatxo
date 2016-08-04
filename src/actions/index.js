@@ -1,8 +1,10 @@
-const ADD_MESSAGE = 'ADD_MESSAGE'
+export const ADD_MESSAGE = 'ADD_MESSAGE';
 
 function addMessage(text) {
   return {
     type: ADD_MESSAGE,
     text
-  }
+  };
 }
+
+export default addMessage;
