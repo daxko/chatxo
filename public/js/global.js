@@ -71,9 +71,20 @@
 
 	var _ChatApp2 = _interopRequireDefault(_ChatApp);
 
+	var _Login = __webpack_require__(265);
+
+	var _Login2 = _interopRequireDefault(_Login);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var store = (0, _configure2.default)({ messages: [{ text: 'Hello' }, { text: 'World' }] });
+	var store = (0, _configure2.default)({ username: null, messages: [] });
+
+	var hasUsername = function hasUsername(nextState, replace) {
+	  var state = store.getState();
+	  if (!state.username) {
+	    replace('/Login');
+	  }
+	};
 
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRedux.Provider,
@@ -81,7 +92,8 @@
 	  _react2.default.createElement(
 	    _reactRouter.Router,
 	    { history: _reactRouter.hashHistory, state: store.getState() },
-	    _react2.default.createElement(_reactRouter.Route, { path: '/', component: _ChatApp2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: '/login', component: _Login2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: '/', component: _ChatApp2.default, onEnter: hasUsername })
 	  )
 	), document.getElementById('react'));
 
@@ -28782,7 +28794,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function configureStore(initialState) {
-	  return (0, _redux.createStore)(_reducers2.default, initialState);
+	  return (0, _redux.createStore)(_reducers2.default, initialState, window.devToolsExtension && window.devToolsExtension());
 	}
 
 /***/ },
@@ -28804,14 +28816,25 @@
 	  var action = arguments[1];
 
 	  switch (action.type) {
+
 	    case _actions.ADD_MESSAGE:
 	      {
 	        return Object.assign({}, state, {
 	          messages: [].concat(_toConsumableArray(state.messages), [{
+	            username: state.username,
+	            timestamp: Date.now(),
 	            text: action.text
 	          }])
 	        });
 	      }
+
+	    case _actions.ADD_USER:
+	      {
+	        return Object.assign({}, state, {
+	          username: action.username
+	        });
+	      }
+
 	    default:
 	      return state;
 	  }
@@ -28828,7 +28851,10 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.addMessage = addMessage;
+	exports.addUser = addUser;
 	var ADD_MESSAGE = exports.ADD_MESSAGE = 'ADD_MESSAGE';
+	var ADD_USER = exports.ADD_USER = 'ADD_USER';
 
 	function addMessage(text) {
 	  return {
@@ -28837,7 +28863,12 @@
 	  };
 	}
 
-	exports.default = addMessage;
+	function addUser(username) {
+	  return {
+	    type: ADD_USER,
+	    username: username
+	  };
+	}
 
 /***/ },
 /* 264 */
@@ -28859,8 +28890,6 @@
 
 	var _actions = __webpack_require__(263);
 
-	var _actions2 = _interopRequireDefault(_actions);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28869,19 +28898,19 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var App = function (_React$Component) {
-	  _inherits(App, _React$Component);
+	var ChatApp = function (_React$Component) {
+	  _inherits(ChatApp, _React$Component);
 
-	  function App(props) {
-	    _classCallCheck(this, App);
+	  function ChatApp(props) {
+	    _classCallCheck(this, ChatApp);
 
-	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChatApp).call(this, props));
 
 	    _this.handleKeyUp = _this.handleKeyUp.bind(_this);
 	    return _this;
 	  }
 
-	  _createClass(App, [{
+	  _createClass(ChatApp, [{
 	    key: 'handleKeyUp',
 	    value: function handleKeyUp(e) {
 	      var sendMessage = this.props.sendMessage;
@@ -28908,7 +28937,14 @@
 	          messages.map(function (message) {
 	            return _react2.default.createElement(
 	              'li',
-	              null,
+	              { key: message.timestamp },
+	              _react2.default.createElement(
+	                'strong',
+	                null,
+	                message.username,
+	                ':'
+	              ),
+	              ' ',
 	              message.text
 	            );
 	          })
@@ -28918,16 +28954,95 @@
 	    }
 	  }]);
 
-	  return App;
+	  return ChatApp;
 	}(_react2.default.Component);
 
 	exports.default = (0, _reactRedux.connect)(function (state) {
-	  return { messages: state.messages };
+	  return { messages: state.messages, username: state.user };
 	}, function (dispatch) {
 	  return { sendMessage: function sendMessage(message) {
-	      return dispatch((0, _actions2.default)(message));
+	      return dispatch((0, _actions.addMessage)(message));
 	    } };
-	})(App);
+	})(ChatApp);
+
+/***/ },
+/* 265 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(173);
+
+	var _reactRouter = __webpack_require__(199);
+
+	var _actions = __webpack_require__(263);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Login = function (_React$Component) {
+	  _inherits(Login, _React$Component);
+
+	  function Login(props) {
+	    _classCallCheck(this, Login);
+
+	    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Login).call(this, props));
+
+	    _this.handleKeyUp = _this.handleKeyUp.bind(_this);
+	    return _this;
+	  }
+
+	  _createClass(Login, [{
+	    key: 'handleKeyUp',
+	    value: function handleKeyUp(e) {
+	      var addUser = this.props.addUser;
+	      var input = this.refs.input;
+
+
+	      if (e.which === 13) {
+	        addUser(input.value);
+	        this.props.router.push('/');
+	      }
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'label',
+	          null,
+	          'What is your name?',
+	          _react2.default.createElement('input', { ref: 'input', type: 'text', onKeyUp: this.handleKeyUp })
+	        )
+	      );
+	    }
+	  }]);
+
+	  return Login;
+	}(_react2.default.Component);
+
+	exports.default = (0, _reactRedux.connect)(null, function (dispatch) {
+	  return { addUser: function addUser(username) {
+	      return dispatch((0, _actions.addUser)(username));
+	    } };
+	})((0, _reactRouter.withRouter)(Login));
 
 /***/ }
 /******/ ]);

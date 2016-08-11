@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import addMessage from '../actions';
+import { addMessage } from '../actions';
 
-class App extends React.Component {
+class ChatApp extends React.Component {
 
   constructor(props) {
     super(props);
@@ -25,7 +25,7 @@ class App extends React.Component {
     return (
       <div>
         <ul>
-          {messages.map(message => <li>{message.text}</li>)}
+          {messages.map(message => <li key={message.timestamp}><strong>{message.username}:</strong> {message.text}</li>)}
         </ul>
         <input ref="input" type="text" onKeyUp={this.handleKeyUp} />
       </div>
@@ -35,6 +35,6 @@ class App extends React.Component {
 }
 
 export default connect(
-  state => ({ messages: state.messages }),
+  state => ({ messages: state.messages, username: state.user }),
   dispatch => ({ sendMessage: (message) => dispatch(addMessage(message)) })
-)(App);
+)(ChatApp);
