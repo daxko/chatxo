@@ -1,22 +1,23 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import socket from '../socket-client';
+import MessageComposer from './MessageComposer';
+import MessageList from './MessageList';
 import { addMessage } from '../actions';
 
 class ChatApp extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleKeyUp = this.handleKeyUp.bind(this);
   }
 
-  handleKeyUp(e) {
-    let { sendMessage } = this.props
-      , { input } = this.refs;
+  componentDidMount() {
+    let { dispatch } = this.props;
 
-    if(e.which === 13) {
-      sendMessage(input.value);
-      input.value = '';
-    }
+    socket.on('new message', message => {
+      console.log(message);
+      // the received message will need to be dispatched here
+    });
   }
 
   render() {
@@ -24,10 +25,8 @@ class ChatApp extends React.Component {
 
     return (
       <div>
-        <ul>
-          {messages.map(message => <li key={message.timestamp}><strong>{message.username}:</strong> {message.text}</li>)}
-        </ul>
-        <input ref="input" type="text" onKeyUp={this.handleKeyUp} />
+        <MessageList messages={messages} />
+        <MessageComposer />
       </div>
     );
   }
@@ -35,6 +34,5 @@ class ChatApp extends React.Component {
 }
 
 export default connect(
-  state => ({ messages: state.messages, username: state.user }),
-  dispatch => ({ sendMessage: (message) => dispatch(addMessage(message)) })
+  state => ({ messages: state.messages })
 )(ChatApp);
