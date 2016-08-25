@@ -8,8 +8,8 @@ function reducer(state = {}, action) {
         messages: [
           ...state.messages,
           {
-            username: state.username,
-            timestamp: Date.now(),
+            username: action.username,
+            timestamp: action.timestamp,
             text: action.text
           }
         ]

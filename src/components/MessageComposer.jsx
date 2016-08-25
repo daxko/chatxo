@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { addMessage } from '../actions';
 import SocketClient from '../socket-client';
 
-class ChatApp extends React.Component {
+class MessageComposer extends React.Component {
 
   constructor(props) {
     super(props);
@@ -21,8 +21,8 @@ class ChatApp extends React.Component {
         text: input.value
       };
 
-      sendMessage(message.text);
-      SocketClient.emit('new message', message);
+      sendMessage(message);
+      SocketClient.emit('chat message', message);
 
       input.value = '';
     }
@@ -41,4 +41,4 @@ class ChatApp extends React.Component {
 export default connect(
   state => ({ messages: state.messages, username: state.username }),
   dispatch => ({ sendMessage: (message) => dispatch(addMessage(message)) })
-)(ChatApp);
+)(MessageComposer);

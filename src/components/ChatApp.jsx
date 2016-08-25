@@ -9,14 +9,23 @@ class ChatApp extends React.Component {
 
   constructor(props) {
     super(props);
+    let { sendMessage } = this.props;
+
+    socket.on('history', messages => {
+      messages.forEach(message => {
+        sendMessage(message);
+      });
+    });
+
+    socket.emit('get history');
   }
 
   componentDidMount() {
-    let { dispatch } = this.props;
+    let { sendMessage } = this.props;
 
     socket.on('new message', message => {
       console.log(message);
-      // the received message will need to be dispatched here
+      sendMessage(message);      
     });
   }
 
@@ -34,5 +43,6 @@ class ChatApp extends React.Component {
 }
 
 export default connect(
-  state => ({ messages: state.messages })
+  state => ({ messages: state.messages }),
+  dispatch => ({ sendMessage: (message) => dispatch(addMessage(message)) })
 )(ChatApp);
